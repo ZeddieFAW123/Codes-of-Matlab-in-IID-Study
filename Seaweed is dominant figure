@@ -1,0 +1,51 @@
+% Define model parameters for seaweed dominance
+	r = 0.6;        % Higher seaweed intrinsic growth rate
+	K = 150;        % Increased carrying capacity
+	alpha = 0.05;   % Low pathogen attack rate
+	beta = 0.05;    % Low pathogen efficiency
+	mu = 0.15;      % High pathogen mortality rate
+	sigma = 0.5;    % Low environmental stress on seaweed
+	delta = 0.5;    % Unfavorable environment for pathogens
+	
+	% Stress factor function (low stress on prey)
+	psi = @(sigma, delta) 1.2 - 0.1 * sigma * delta;  
+	
+	% Additional predator growth function (weak pathogen support)
+	f = @(sigma, delta) 0.02 * sigma * delta;  
+	
+	% Initial Conditions: [S0, P0] (Seaweed, Pathogen)
+	S0 = 60;  % Initial seaweed population
+	P0 = 20;  % Initial pathogen population
+	y0 = [S0, P0];
+	
+	% Time Span for Simulation
+	tspan = [0 200];  % Long simulation period
+	
+	% Define the system of ODEs
+	function dydt = prey_predator_ode(t, y, r, K, alpha, beta, mu, psi, f, sigma, delta)
+	S = y(1);
+	P = y(2);
+	
+	% Compute growth and interaction terms
+	dSdt = psi(sigma, delta) * r * S * (1 - S / K) - alpha * beta * S * P;
+	dPdt = alpha * beta * S * P + f(sigma, delta) - mu * P;
+	
+	dydt = [dSdt; dPdt];
+	end
+	
+	% Solve ODE system using ODE45
+	[t, Y] = ode45(@(t, y) prey_predator_ode(t, y, r, K, alpha, beta, mu, psi, f, sigma, delta), tspan, y0);
+	
+	% Extract solutions
+	S = Y(:, 1); % Seaweed Population
+	P = Y(:, 2); % Pathogen Population
+	
+	% Plot results
+	figure;
+	plot(t, S, 'b', 'LineWidth', 2); hold on;
+	plot(t, P, 'r', 'LineWidth', 2);
+	xlabel('Time (\itt)');
+	ylabel('Population Size');
+	legend('Seaweed (\itS)', 'Pathogen (\itP)');
+	title('Seaweed is Dominant due to Favorable Environment');
+	grid on;
