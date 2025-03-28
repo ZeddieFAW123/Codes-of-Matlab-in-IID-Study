@@ -1,0 +1,47 @@
+		% Define model parameters
+		r = 0.5;       % Intrinsic growth rate of prey
+		K = 100;       % Carrying capacity of prey
+		alpha = 0.02;  % Attack rate of predators on prey
+		beta = 0.1;    % Conversion efficiency of consumed prey into predator biomass
+		mu = 0.1;      % Predator mortality rate
+		sigma = 1.0;   % Environmental parameter
+		delta = 0.5;   % Environmental factor
+		psi = @(sigma, delta) 1.2 - 0.2 * sigma * delta;  % Stress factor function
+		f = @(sigma, delta) 0.05 * sigma * delta;  % Additional predator growth function
+		
+		% Initial Conditions: [S0, P0] (Prey, Predator)
+		S0 = 50;  % Initial prey population
+		P0 = 10;  % Initial predator population
+		y0 = [S0, P0];
+		
+		% Time Span for Simulation
+		tspan = [0 100];
+		
+		% Define the system of ODEs
+		function dydt = prey_predator_ode(t, y, r, K, alpha, beta, mu, psi, f, sigma, delta)
+		S = y(1);
+		P = y(2);
+		
+		% Compute growth and interaction terms
+		dSdt = psi(sigma, delta) * r * S * (1 - S / K) - alpha * beta * S * P;
+		dPdt = alpha * beta * S * P + f(sigma, delta) - mu * P;
+		
+		dydt = [dSdt; dPdt];
+		end
+		
+		% Solve ODE system using ODE45
+		[t, Y] = ode45(@(t, y) prey_predator_ode(t, y, r, K, alpha, beta, mu, psi, f, sigma, delta), tspan, y0);
+		
+		% Extract solutions
+		S = Y(:, 1);
+		P = Y(:, 2);
+		
+		% Plot results
+		figure;
+		plot(t, S, 'b', 'LineWidth', 2); hold on;
+		plot(t, P, 'r', 'LineWidth', 2);
+		xlabel('Time');
+		ylabel('Population Size');
+		legend('Prey (S)', 'Predator (P)');
+		title('Prey-Predator Dynamics');
+		grid on;
