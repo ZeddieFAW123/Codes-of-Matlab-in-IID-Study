@@ -1,3 +1,4 @@
+
 		% Define model parameters
 		r = 0.5;       % Intrinsic growth rate of prey
 		K = 100;       % Carrying capacity of prey
@@ -40,8 +41,8 @@
 		figure;
 		plot(t, S, 'b', 'LineWidth', 2); hold on;
 		plot(t, P, 'r', 'LineWidth', 2);
-		xlabel('Time');
+		xlabel('Time(\itt)');
 		ylabel('Population Size');
-		legend('Prey (S)', 'Predator (P)');
+		legend('Prey (\itS)', 'Predator (\itP)');
 		title('Prey-Predator Dynamics');
 		grid on;
