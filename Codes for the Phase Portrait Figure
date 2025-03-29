@@ -1,0 +1,48 @@
+clc; clear; close all;
+
+% Define the grid for seaweed (S) and pathogen (P) populations
+[S, P] = meshgrid(linspace(0, 12, 15), linspace(0, 8, 15));  % Less dense grid
+
+% System parameters (Modify based on your model)
+r = 0.5;    % Seaweed growth rate
+K = 10;     % Carrying capacity
+alpha = 0.1; % Pathogen attack rate
+beta = 0.05; % Conversion efficiency factor
+mu = 0.02;  % Natural mortality of seaweed
+gamma = 0.1; % Pathogen decay rate
+
+% Define system of ODEs
+dSdt = r * S .* (1 - S/K) - alpha * S .* P - mu * S;
+dPdt = beta * S .* P - gamma * P;
+
+% Create figure
+figure;
+hold on;
+
+% Vector field (Refined quiver plot with fewer arrows)
+quiver(S, P, dSdt, dPdt, 'k', 'AutoScaleFactor', 0.6, 'LineWidth', 1.2, 'MaxHeadSize', 0.5);
+
+% Contour plot for better trajectory visualization
+[S_fine, P_fine] = meshgrid(linspace(0, 12, 50), linspace(0, 8, 50)); % Higher resolution for contours
+dSdt_fine = interp2(S, P, dSdt, S_fine, P_fine, 'cubic');
+dPdt_fine = interp2(S, P, dPdt, S_fine, P_fine, 'cubic');
+contour(S_fine, P_fine, sqrt(dSdt_fine.^2 + dPdt_fine.^2), 18, 'LineWidth', 1.2);
+
+% Equilibrium points (Modify based on system analysis)
+equilibrium_pts = [0, 0; 10, 1.5];  % Example equilibria
+plot(equilibrium_pts(:,1), equilibrium_pts(:,2), 'ro', 'MarkerSize', 10, 'MarkerFaceColor', 'r', 'DisplayName', 'Equilibria');
+
+% Labels and title with refined font settings
+xlabel('Seaweed Population (\itS)', 'FontSize', 14, 'FontWeight', 'Bold');
+ylabel('Pathogen Population (\itP)', 'FontSize', 14, 'FontWeight', 'Bold');
+title('Phase Portrait of Prey-Predator Model', 'FontSize', 15, 'FontWeight', 'Bold');
+
+% Enhanced grid and aesthetics
+grid on;
+set(gca, 'FontSize', 12, 'LineWidth', 1.2, 'Box', 'on');
+
+% Custom legend
+legend({'Vector Field', 'Equilibria'}, 'Location', 'northeast', 'FontSize', 12);
+
+hold off;
+	
